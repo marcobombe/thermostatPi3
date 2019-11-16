@@ -1,58 +1,42 @@
-import kivy
-kivy.require('1.11.1') 
+from guizero import *
+import sys
+from PIL import Image
 
-from kivy.app import App
-from kivy.uix.label import Label
-from kivy.config import Config
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
-from kivy.uix.textinput import TextInput
-
-class LoginScreen(GridLayout):    
+app = App(title="thermostatPi3", layout="grid", height=600, width=800)
 
 
-        def __init__(self, **kwargs):
-                super(LoginScreen, self).__init__(**kwargs)
-
-                virtual_keyboard = GridLayout(cols=3)
-                virtual_keyboard.add_widget(Button(text='1'))
-                virtual_keyboard.add_widget(Button(text='2'))
-                virtual_keyboard.add_widget(Button(text='3'))
-                virtual_keyboard.add_widget(Button(text='4'))
-                virtual_keyboard.add_widget(Button(text='5'))
-                virtual_keyboard.add_widget(Button(text='6'))
-                virtual_keyboard.add_widget(Button(text='7'))
-                virtual_keyboard.add_widget(Button(text='8'))
-                virtual_keyboard.add_widget(Button(text='9'))
-                virtual_keyboard.add_widget(Button(text='-'))
-                virtual_keyboard.add_widget(Button(text='0'))
-                virtual_keyboard.add_widget(Button(text='-'))
-
-                self.cols = 2
-                self.add_widget(Label(text='thermostatPi\ninsert password to login'))
-                self.password = TextInput(password=True, multiline=False)
-                self.add_widget(self.password)
-                self.add_widget(virtual_keyboard)
-                self.add_widget(Button(text='Login'))
-
-class thermostatPi3(App):
+def do_nothing():
+    print("A picture button was pressed")
+    on_off.image = "resources/shut-down-line(1).png"
+    sys.exit(0)
 
 
+###
+wifi_logo = Picture(app, image="resources/wifi-line.png", grid=[0,0], align="top")
 
-        def build(self):
-                # Set app title
-                self.title = 'thermostatPi3'
-                # Set app screen dimensions
-                Config.set('graphics', 'width', '480')
-                Config.set('graphics', 'height', '320')
-                # Uncomment in release stage
-                #Config.set('graphics', 'borderless', '1')
- 
-                return LoginScreen()
+thermostatPi3_name = Text(app, text="          thermostatPi3          ", grid=[1, 0], align="top")
+
+on_off = PushButton(app, image="resources/shut-down-line(1).png", command=do_nothing, grid=[2, 0],  align="left")
+
+###
+calendar_logo = Picture(app, image="resources/calendar-event-fill.png", grid=[0, 1], align="top")
+
+temp_up = Picture(app, image="resources/arrow-up-s-fill.png", grid=[2, 1], align="top")
+
+###
+
+mode = Picture(app, image="resources/robot-line.png", grid=[0, 2], align="top")
+
+temperature = Text(app, text="      18 C              ", grid=[1, 2], align="top")
+
+set_temp = Text(app, text="      23 C ", grid=[2,2], align="top")
 
 
-if __name__ == '__main__':
-        thermostatPi3().run()
+###
+temp_down = Picture(app, image="resources/arrow-down-s-fill.png", grid=[2,3], align="top")
+
+###
+date = Text(app, text="Lunedi 23 Gennaio ", grid=[0,4], align="top")
+heat_on_off = Picture(app, image="resources/fire-fill.png", grid=[1,4], align="top")
+hour = Text(app, text="     22:33    ", grid=[2,4], align="top")
+app.display()
