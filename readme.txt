@@ -1,3 +1,0 @@
-Credits:
-
-https://remixicon.com/
