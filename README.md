@@ -11,7 +11,7 @@ Icon Set:
 https://remixicon.com/
 
 Icon dimension:
-120px
+96px
 
 Color theme:
 https://material.io/design/color/dark-theme.html
