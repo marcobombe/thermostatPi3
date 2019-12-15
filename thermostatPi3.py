@@ -21,7 +21,7 @@ def get_date():
 # Get the current Time
 def get_time():
     now = datetime.now()
-    system_time = now.strftime("%H:%M:%S")
+    system_time = now.strftime("%H:%M")
     return system_time
 
 # Current time update function    
@@ -44,7 +44,7 @@ try:
 except:
     import http.client as httplib
 
-def have_internet():
+def internet_connection_check():
     conn = httplib.HTTPConnection("www.google.com", timeout=5)
     try:
         conn.request("HEAD", "/")
@@ -56,23 +56,31 @@ def have_internet():
         
 # Connection status update function    
 def update_connection_status():
-    if have_internet():
+    if internet_connection_check():
         connection_status.image = "resources/wifi-line.png"
     else:
         connection_status.image = "resources/wifi-off-line.png"
    
-#setting up the main graphic   
-connection_status = Picture(app, image="resources/wifi-line.png", grid=[0,0], align="top")
-connection_status.repeat(1000, update_connection_status)
+# Setting up the main graphic
+        
+# Setup the connection status indication        
+connection_status = Picture(app, image="resources/wifi-line.png", grid=[0,0], align="left")
+connection_status.repeat(20000, update_connection_status)
 
+# Setup the App name
 thermostatPi3_name = Text(app, text="          thermostatPi3          ", grid=[1, 0], align="top")
+
+# Temperature controls
+temp_up = PushButton(app, image="resources/arrow-drop-up-line.png", grid=[2, 1], align="right")
+temp_down = PushButton(app, image="resources/arrow-drop-down-line.png", grid=[2,3], align="right")
+
 
 on_off = PushButton(app, image="resources/shut-down-line(1).png", command=do_nothing, grid=[2, 0],  align="left")
 
 ###
-calendar_logo = Picture(app, image="resources/calendar-event-fill.png", grid=[0, 1], align="top")
+calendar_logo = Picture(app, image="resources/calendar-event-line.png", grid=[0, 1], align="top")
 
-temp_up = Picture(app, image="resources/arrow-up-s-fill.png", grid=[2, 1], align="top")
+
 
 ###
 
@@ -84,7 +92,7 @@ set_temp = Text(app, text="      23 C ", grid=[2,2], align="top")
 
 
 ###
-temp_down = Picture(app, image="resources/arrow-down-s-fill.png", grid=[2,3], align="top")
+
 
 ###
 
@@ -93,11 +101,11 @@ heat_on_off = Picture(app, image="resources/fire-fill.png", grid=[1,4], align="t
 
 # Show system date and update it every second
 current_date = Text(app, text=get_date(), grid=[0,4], align="left")
-current_date.repeat(1000, update_date) 
+current_date.repeat(5000, update_date) 
 
 # Show system time and update it every second
 current_time = Text(app, text= get_time(), grid=[2,4], align="right")
-current_time.repeat(1000, update_time)
+current_time.repeat(3000, update_time)
 
 # Final App display
 app.display()
