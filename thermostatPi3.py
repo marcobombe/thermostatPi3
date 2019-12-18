@@ -3,7 +3,6 @@ import time
 import datetime
 from datetime import datetime
 import sys
-
 # Setting up the main App window properies
 app = App(title="thermostatPi3", layout="grid", height=600, width=800)
 #app.tk.attributes("-fullscreen",True)
@@ -78,7 +77,7 @@ temp_down = PushButton(app, image="resources/arrow-drop-down-line.png", grid=[2,
 on_off = PushButton(app, image="resources/shut-down-line(1).png", command=do_nothing, grid=[2, 0],  align="left")
 
 ###
-calendar_logo = Picture(app, image="resources/calendar-event-line.png", grid=[0, 1], align="top")
+calendar_logo = Picture(app, image="resources/calendar-event-fill.png", grid=[0, 1], align="top")
 
 
 
