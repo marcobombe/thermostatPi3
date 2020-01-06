@@ -68,7 +68,7 @@ def internet_connection_check():
         return False
         
 # Connection status update function    
-def update_connection_status_w():
+def update_connection_status():
     if internet_connection_check():
         #connection_status_w.image = "resources/wifi-line.png"
         connection_status_w.value = "WIFI-ON"
@@ -112,7 +112,7 @@ def update_heat_status():
 # Setup the connection status indication        
 #connection_status_w = Picture(app, image="resources/wifi-line.png", grid=[0,0], align="left")
 connection_status_w = Text(app, text="WIFI", grid=[0,0], align="left")
-connection_status_w.repeat(8000, update_connection_status_w)
+connection_status_w.repeat(8000, update_connection_status)
 
 # Setup the App name
 thermostatPi3_name_w = Text(app, text="       thermostatPi3", grid=[1, 0], align="left")
@@ -121,10 +121,13 @@ thermostatPi3_name_w.text_color = "gray"
 # Temperature controls
 #temp_up_w = PushButton(app, image="resources/arrow-drop-up-line.png", grid=[2, 1], align="right")
 #temp_down_w = PushButton(app, image="resources/arrow-drop-down-line.png", grid=[2,3], align="right")
-temp_up_w = PushButton(app, text="TEMP UP", command=increase_set_point, grid=[2, 1], align="right")
+temp_up_w = PushButton(app, text="    TEMP UP   ", command=increase_set_point, grid=[2, 1], align="right")
+#temp_up_w.tk.config(highlightbackground="black")
+temp_up_w.tk.config(highlightthickness = 0)
 temp_up_w.text_color = "red"
 
 temp_down_w = PushButton(app, text="TEMP DOWN", command=decrease_set_point, grid=[2,3], align="right")
+temp_down_w.tk.config(highlightthickness = 0)
 temp_down_w.text_color = "blue"
 
 
@@ -165,6 +168,7 @@ current_date_w.repeat(5000, update_date)
 current_time_w = Text(app, text= get_time(), grid=[2,4], align="right")
 current_time_w.repeat(3000, update_time)
 
+update_connection_status()
 
 # Final App display
 app.display()
