@@ -80,16 +80,16 @@ def update_connection_status():
         
 # Setpoint Management   
 def increase_set_point():        
-   global setpoint_temp
-   global mode
-   setpoint_temp = setpoint_temp + 1
-   mode = "MAN"
+    global setpoint_temp
+    global mode
+    setpoint_temp = setpoint_temp + 1
+    mode = "MAN"
    
 def decrease_set_point():        
-   global setpoint_temp
-   global mode
-   setpoint_temp = setpoint_temp - 1
-   mode = "MAN"
+    global setpoint_temp
+    global mode
+    setpoint_temp = setpoint_temp - 1
+    mode = "MAN"
       
 def update_setpoint_indication():
     global setpoint_temp
@@ -121,15 +121,15 @@ thermostatPi3_name_w.text_color = "gray"
 # Temperature controls
 #temp_up_w = PushButton(app, image="resources/arrow-drop-up-line.png", grid=[2, 1], align="right")
 #temp_down_w = PushButton(app, image="resources/arrow-drop-down-line.png", grid=[2,3], align="right")
-temp_up_w = PushButton(app, text="    TEMP UP   ", command=increase_set_point, grid=[2, 1], align="right")
-#temp_up_w.tk.config(highlightbackground="black")
+temp_up_w = PushButton(app, text="TEMP UP", command=increase_set_point, grid=[2, 1], align="right")
 temp_up_w.tk.config(highlightthickness = 0)
+temp_up_w.tk.config(borderwidth=0)
 temp_up_w.text_color = "red"
 
 temp_down_w = PushButton(app, text="TEMP DOWN", command=decrease_set_point, grid=[2,3], align="right")
 temp_down_w.tk.config(highlightthickness = 0)
+temp_down_w.tk.config(borderwidth=0)
 temp_down_w.text_color = "blue"
-
 
 #Settings
 settings_w = Text(app, text="Settings", grid=[0,3], align="left")
@@ -137,6 +137,8 @@ settings_w = Text(app, text="Settings", grid=[0,3], align="left")
 # On-Off control (debug only)
 #on_off_w = PushButton(app, image="resources/shut-down-line.png", command=do_nothing, grid=[2, 0],  align="left")
 on_off_w = PushButton(app, text="OFF", command=do_nothing, grid=[2, 0],  align="right")
+on_off_w.tk.config(highlightthickness = 0)
+on_off_w.tk.config(borderwidth=0)
 on_off_w.text_color = "red"
 
 # Calendar function
