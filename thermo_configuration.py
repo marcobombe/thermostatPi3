@@ -1,16 +1,22 @@
 #!/usr/bin/env python
 
-import configparser
+# System imports
 import io
 import os
 
+# Configparser imports
+import configparser
+
+# Logging imports
+import logging
+
+# Globals
 configfile_name = "config.ini"
 
-
-# Check if there is already a configurtion file
-def init_db():
+# Check if there is already a configurtion file if not regenerate it
+def init_conf():
     if not os.path.isfile(configfile_name):
-        print("Create the configuration file as it doesn't exist yet")
+        logging.warning('Create the configuration file as it doesn\'t exist yet. Factory configuration is applyed.')
         cfg_file = open(configfile_name, 'w')
 
         config = configparser.ConfigParser()
@@ -25,40 +31,41 @@ def init_db():
 
         config.add_section('global_settings')
         config['global_settings']['hysteresis'] = '5'
+        
+        config.add_section('others')
+        config['others']['logging_level'] = 'DEBUG'        
 
         config.write(cfg_file)
         cfg_file.close()
+        logging.warning('Configuration file created.')
     else:
-        print("Configuration file ok")
+        logging.info('Configuration file present.')
         pass
 
-
+# Basic config check
 def read_conf():
+    logging.info('Start parsing configuration file.')
     config = configparser.ConfigParser()
     config.read(configfile_name)
-
     config_version = config['thermostatPi']['config_version']
+    logging.info('Configuration file version: %s', config_version)
+    logging.info('Parsing configuration file finished.')
 
-    print(f'Configuration file version: {config_version}')
-
-
+# Function for reading a parameter from configuration file
 def read_conf_param(section, param):
     config = configparser.ConfigParser()
     config.read(configfile_name)
-
     value = config[section][param]
-
-    print(f'Read from configuration file: {section} {param} {value}')
-
+    logging.debug('Read parameter from configuration file: %s[%s] = %s', str(section) , str(param), str(value))
     return value
 
-
+# Function for write/update a parameter to configuration file
 def write_conf_param(section, param, value):
     config = configparser.ConfigParser()
     config.read(configfile_name)
-
     with open(configfile_name, 'w') as configfile:
         config.set(section, param, value)
         config.write(configfile)
         configfile.close()
-        print(f'Write to configuration file: {section} {param} {value}')
+        logging.debug('Write parameter to configuration file: %s[%s] = %s', str(section) , str(param), str(value))
+

@@ -1,41 +1,53 @@
+# Guizero import
 from guizero import *
+
+# System related imports
+import sys
+import os
+
+# Time related imports
 import time
 import datetime
 from datetime import datetime
-import sys
 
-from thermo_configuration import init_db
+# Program logging system related imports
+import logging
+
+# Permanent configuration utility imports
+from thermo_configuration import init_conf
 from thermo_configuration import read_conf
 from thermo_configuration import read_conf_param
 from thermo_configuration import write_conf_param
 
 # Global Variables
-
 current_temp = 0.0
 set_point_temp = 0.0
 mode = "AUTO"
-
 auto_str = "AUTO"
 man_str = "MAN"
-
 heat = "OFF"
-
 temp_udm = " °C"
 
-# Setting up the main App window properies
-app = App(title="thermostatPi3", layout="grid")
-# app.tk.attributes("-fullscreen",True)
+# Main funtions
 
-init_db()
-read_conf()
-read_conf_param('thermostatPi', 'config_version')
-print(read_conf_param('thermostatPi', 'config_version'))
-print(read_conf_param('global_settings', 'hysteresis'))
-
-# Material design dark theme settings_w.
-app.bg = "#121212"
-app.text_color = "white"
-
+# Update current logging system logging 
+def update_log_level(selected_value):
+    logger = logging.getLogger() 
+    if selected_value == "DEBUG":
+        logger.setLevel(logging.DEBUG)
+        logging.critical('Logging level now is DEBUG')
+    elif selected_value == "INFO":
+        logger.setLevel(logging.INFO)
+        logging.critical('Logging level now is INFO')
+    elif selected_value == "WARNING":
+        logger.setLevel(logging.WARNING)
+        logging.critical('Logging level now is WARNING')
+    elif selected_value == "ERROR":
+        logger.setLevel(logging.ERROR)
+        logging.critical('Logging level now is ERROR')
+    elif selected_value == "CRITICAL":
+        logger.setLevel(logging.CRITICAL)
+        logging.critical('Logging level now is CRITICAL')
 
 # Get the current Date
 def get_date():
@@ -61,9 +73,8 @@ def update_date():
     current_date_w.value = get_date()
 
 
-def do_nothing():
-    print("A picture button was pressed")
-    # on_off_w.image = "resources/shut-down-line.png"
+def program_quit():
+    logging.critical('ThermostatPi3 quitted by user.')
     time.sleep(1)
     sys.exit(0)
 
@@ -89,11 +100,9 @@ def internet_connection_check():
 # Connection status update function    
 def update_connection_status():
     if internet_connection_check():
-        # connection_status_w.image = "resources/wifi-line.png"
         connection_status_w.value = "WIFI-ON"
         connection_status_w.text_color = "green"
     else:
-        # connection_status_w.image = "resources/wifi-off-line.png"
         connection_status_w.value = "WIFI-OFF"
         connection_status_w.text_color = "red"
 
@@ -142,12 +151,71 @@ def settings_window_close():
 
 def settings_apply():
     write_conf_param("global_settings", "hysteresis", str(hysteresis_slider.value))
+    logger = logging.getLogger()
 
+    if (logger.getEffectiveLevel() == 50):
+        write_conf_param("others", "logging_level", "CRITICAL")
+        logger.setLevel(logging.CRITICAL)
+    elif (logger.getEffectiveLevel() == 40):
+        write_conf_param("others", "logging_level", "ERROR")
+        logger.setLevel(logging.ERROR)
+    elif (logger.getEffectiveLevel() == 30):
+        write_conf_param("others", "logging_level", "WARNING")
+        logger.setLevel(logging.WARNING)
+    elif (logger.getEffectiveLevel() == 20):
+        write_conf_param("others", "logging_level", "INFO")
+        logger.setLevel(logging.INFO)
+    elif (logger.getEffectiveLevel() == 10):
+        write_conf_param("others", "logging_level", "DEBUG")
+        logger.setLevel(logging.DEBUG)
+    elif (logger.getEffectiveLevel() == 0):
+        write_conf_param("others", "logging_level", "NOTSET")
+        logger.setLevel(logging.NOTSET)
+
+def clear_log():
+    if os.path.exists("thermo_log.log"):
+        f = open('thermo_log.log', 'r+')
+        f.truncate(0) 
+        logging.critical('User clear the log.')
+    else:
+        logging.critical('Log file does not exist.')
+
+# Setting up the main App window properies
+app = App(title="thermostatPi3", layout="grid")
+# app.tk.attributes("-fullscreen",True)
+
+# Setting up the logging system
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s: %(message)s",
+    datefmt="%m/%d/%Y %H:%M:%S",
+    handlers=[
+        logging.FileHandler("thermo_log.log"), # TODO: settings option for the oprional use of RotatingFileHandler
+        logging.StreamHandler()
+    ]
+)
+
+logger = logging.getLogger()
+logging.info('ThermostatPi started')
+logging.info('Logging started')
+
+# Permanent configuration startup test, and initialization
+init_conf()
+
+# Basic configuration file chech
+read_conf()
+read_conf_param('thermostatPi', 'config_version')
+
+# Update logging level
+update_log_level(read_conf_param("others", "logging_level"))
+
+# Material design dark theme settings_w.
+app.bg = "#121212"
+app.text_color = "white"
 
 # Setting up the main graphic
 
 # Setup the connection status indication        
-# connection_status_w = Picture(app, image="resources/wifi-line.png", grid=[0,0], align="left")
 connection_status_w = Text(app, text="WIFI", grid=[0, 0], align="left")
 connection_status_w.repeat(8000, update_connection_status)
 
@@ -156,8 +224,6 @@ thermostatPi3_name_w = Text(app, text="       thermostatPi3", grid=[1, 0], align
 thermostatPi3_name_w.text_color = "gray"
 
 # Temperature controls
-# temp_up_w = PushButton(app, image="resources/arrow-drop-up-line.png", grid=[2, 1], align="right")
-# temp_down_w = PushButton(app, image="resources/arrow-drop-down-line.png", grid=[2,3], align="right")
 temp_up_w = PushButton(app, text="TEMP UP", command=increase_set_point, grid=[2, 1], align="right")
 temp_up_w.tk.config(highlightthickness=0)
 temp_up_w.tk.config(borderwidth=0)
@@ -174,18 +240,15 @@ settings_w.tk.config(highlightthickness=0)
 settings_w.tk.config(borderwidth=0)
 
 # On-Off control (debug only)
-# on_off_w = PushButton(app, image="resources/shut-down-line.png", command=do_nothing, grid=[2, 0],  align="left")
-on_off_w = PushButton(app, text="OFF", command=do_nothing, grid=[2, 0], align="right")
+on_off_w = PushButton(app, text="OFF", command=program_quit, grid=[2, 0], align="right")
 on_off_w.tk.config(highlightthickness=0)
 on_off_w.tk.config(borderwidth=0)
 on_off_w.text_color = "red"
 
 # Calendar function
-# calendar_logo_w = Picture(app, image="resources/calendar-event-fill.png", grid=[0, 1], align="left")
 calendar_logo_w = Text(app, text="CALENDAR", grid=[0, 1], align="top")
 
 # Mode Indication
-# mode_w = Picture(app, image="resources/robot-line.png", grid=[0, 2], align="top")
 mode_w = Text(app, text="AUTO", grid=[0, 2], align="left")
 mode_w.repeat(100, update_mode_indication)
 
@@ -197,7 +260,6 @@ set_point_indication_w = Text(app, text="       0.0" + temp_udm, grid=[2, 2], al
 set_point_indication_w.repeat(100, update_setpoint_indication)
 
 # Heat on-off Indication
-# heat_on_off_w = Picture(app, image="resources/fire-fill.png", grid=[1,4], align="top")
 heat_on_off_w = Text(app, text="       HEAT OFF", grid=[1, 4], align="left")
 heat_on_off_w.repeat(100, update_heat_status)
 
@@ -211,36 +273,40 @@ current_time_w.repeat(3000, update_time)
 
 update_connection_status()
 
+# Settings Window
 settings_window = Window(app, title="Settings", layout="grid")
 # settings_window.tk.attributes("-fullscreen",True)
 
-# Material design dark theme settings_w.
+# Material design dark theme for settings window.
 settings_window.bg = "#121212"
 settings_window.text_color = "white"
 
-settings_title = Text(settings_window, "Settings: ", grid=[0, 0])
-hysteresis = Text(settings_window, "  hysteresis: ", grid=[0, 1])
-# hysteresis_setting_value = TextBox(settings_window, text="15", grid=[1,1])
-# hysteresis_setting_value.tk.config(highlightthickness = 0)
-# hysteresis_setting_value.tk.config(borderwidth=0)
+settings_title = Text(settings_window, "Settings: ", grid=[0, 0], align="left")
+hysteresis = Text(settings_window, "Hysteresis: ", grid=[0, 1], align="left")
 
-# def hysteresis_slider_changed(hysteresis_slider):
-#    hysteresis_setting_value.value = hysteresis_slider
-
-hysteresis_slider = Slider(settings_window, start=5, end=60, grid=[2, 1])
-# hysteresis_slider.value = 15
+hysteresis_slider = Slider(settings_window, start=5, end=60, grid=[1, 1], align="left")
 hysteresis_slider.value = int(read_conf_param('global_settings', 'hysteresis'))
 hysteresis_slider.tk.config(highlightthickness=0)
 hysteresis_slider.tk.config(borderwidth=0)
 
-min_label = Text(settings_window, "minutes.", grid=[3, 1])
+minutes_label = Text(settings_window, "minutes.", grid=[2, 1], align="left")
 
-apply = PushButton(settings_window, text="Apply", command=settings_apply, grid=[3, 4])
+log_label = Text(settings_window, "Logging level: ", grid=[0, 4], align="left")
+
+combo = Combo(settings_window, options=["", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], command=update_log_level, grid=[1, 4], align="left")
+combo.value = read_conf_param('others', 'logging_level')
+
+clear_log = PushButton(settings_window, text="Clear Log", command=clear_log, grid=[2, 4])
+clear_log.tk.config(highlightthickness=0)
+clear_log.tk.config(borderwidth=0)
+clear_log.text_color = "red"
+
+apply = PushButton(settings_window, text="Apply", command=settings_apply, grid=[2, 5])
 apply.tk.config(highlightthickness=0)
 apply.tk.config(borderwidth=0)
 apply.text_color = "yellow"
 
-close = PushButton(settings_window, text="Close", command=settings_window_close, grid=[4, 4])
+close = PushButton(settings_window, text="Close", command=settings_window_close, grid=[3, 5])
 close.tk.config(highlightthickness=0)
 close.tk.config(borderwidth=0)
 close.text_color = "red"
