@@ -5,10 +5,11 @@ from guizero import *
 import sys
 import os
 
-# Time related imports
+# Time and date related imports
 import time
 import datetime
 from datetime import datetime
+import calendar
 
 # Program logging system related imports
 import logging
@@ -148,6 +149,13 @@ def settings_window_open():
 def settings_window_close():
     settings_window.hide()
 
+def calendar_window_open():
+    calendar_window.show(wait=True)
+
+
+def calendar_window_close():
+    calendar_window.hide()    
+
 
 def settings_apply():
     write_conf_param("global_settings", "hysteresis", str(hysteresis_slider.value))
@@ -246,7 +254,10 @@ on_off_w.tk.config(borderwidth=0)
 on_off_w.text_color = "red"
 
 # Calendar function
-calendar_logo_w = Text(app, text="CALENDAR", grid=[0, 1], align="top")
+#calendar_logo_w = Text(app, text="CALENDAR", grid=[0, 1], align="top")
+calendar_w = PushButton(app, text="CALENDAR", command=calendar_window_open, grid=[0, 1], align="left")
+calendar_w.tk.config(highlightthickness=0)
+calendar_w.tk.config(borderwidth=0)
 
 # Mode Indication
 mode_w = Text(app, text="AUTO", grid=[0, 2], align="left")
@@ -312,6 +323,28 @@ close.tk.config(borderwidth=0)
 close.text_color = "red"
 
 settings_window.hide()
+
+# Calendar Window
+calendar_window = Window(app, title="Calendar", layout="grid")
+# calendar_window.tk.attributes("-fullscreen",True)
+
+# Material design dark theme for settings window.
+calendar_window.bg = "#121212"
+calendar_window.text_color = "white"
+
+calendar_title = Text(calendar_window, "Calendar: ", grid=[0, 0], align="left")
+
+i = 1
+for day in calendar.day_name:
+    # print (day[0:3])
+    Text(calendar_window, day[0:3], grid=[0, i], align="left")
+    i = i + 1
+    hours = range(0,23)
+    for count in hours:
+        count = count + 1
+        PushButton(calendar_window, text=str(count)+":00", grid=[count, i])
+    
+calendar_window.hide()
 
 # Final App display
 app.display()
