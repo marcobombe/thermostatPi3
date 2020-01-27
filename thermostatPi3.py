@@ -29,11 +29,12 @@ man_str = "MAN"
 heat = "OFF"
 temp_udm = " °C"
 
-# Main funtions
+
+# Main functions
 
 # Update current logging system logging 
 def update_log_level(selected_value):
-    logger = logging.getLogger() 
+    logger = logging.getLogger()
     if selected_value == "DEBUG":
         logger.setLevel(logging.DEBUG)
         logging.critical('Logging level now is DEBUG')
@@ -49,6 +50,7 @@ def update_log_level(selected_value):
     elif selected_value == "CRITICAL":
         logger.setLevel(logging.CRITICAL)
         logging.critical('Logging level now is CRITICAL')
+
 
 # Get the current Date
 def get_date():
@@ -149,44 +151,47 @@ def settings_window_open():
 def settings_window_close():
     settings_window.hide()
 
+
 def calendar_window_open():
     calendar_window.show(wait=True)
 
 
 def calendar_window_close():
-    calendar_window.hide()    
+    calendar_window.hide()
 
 
 def settings_apply():
     write_conf_param("global_settings", "hysteresis", str(hysteresis_slider.value))
     logger = logging.getLogger()
 
-    if (logger.getEffectiveLevel() == 50):
+    if logger.getEffectiveLevel() == 50:
         write_conf_param("others", "logging_level", "CRITICAL")
         logger.setLevel(logging.CRITICAL)
-    elif (logger.getEffectiveLevel() == 40):
+    elif logger.getEffectiveLevel() == 40:
         write_conf_param("others", "logging_level", "ERROR")
         logger.setLevel(logging.ERROR)
-    elif (logger.getEffectiveLevel() == 30):
+    elif logger.getEffectiveLevel() == 30:
         write_conf_param("others", "logging_level", "WARNING")
         logger.setLevel(logging.WARNING)
-    elif (logger.getEffectiveLevel() == 20):
+    elif logger.getEffectiveLevel() == 20:
         write_conf_param("others", "logging_level", "INFO")
         logger.setLevel(logging.INFO)
-    elif (logger.getEffectiveLevel() == 10):
+    elif logger.getEffectiveLevel() == 10:
         write_conf_param("others", "logging_level", "DEBUG")
         logger.setLevel(logging.DEBUG)
-    elif (logger.getEffectiveLevel() == 0):
+    elif logger.getEffectiveLevel() == 0:
         write_conf_param("others", "logging_level", "NOTSET")
         logger.setLevel(logging.NOTSET)
+
 
 def clear_log():
     if os.path.exists("thermo_log.log"):
         f = open('thermo_log.log', 'r+')
-        f.truncate(0) 
+        f.truncate(0)
         logging.critical('User clear the log.')
     else:
         logging.critical('Log file does not exist.')
+
 
 # Setting up the main App window properies
 app = App(title="thermostatPi3", layout="grid")
@@ -198,7 +203,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s: %(message)s",
     datefmt="%m/%d/%Y %H:%M:%S",
     handlers=[
-        logging.FileHandler("thermo_log.log"), # TODO: settings option for the oprional use of RotatingFileHandler
+        logging.FileHandler("thermo_log.log"),  # TODO: settings option for the optional use of RotatingFileHandler
         logging.StreamHandler()
     ]
 )
@@ -254,7 +259,7 @@ on_off_w.tk.config(borderwidth=0)
 on_off_w.text_color = "red"
 
 # Calendar function
-#calendar_logo_w = Text(app, text="CALENDAR", grid=[0, 1], align="top")
+# calendar_logo_w = Text(app, text="CALENDAR", grid=[0, 1], align="top")
 calendar_w = PushButton(app, text="CALENDAR", command=calendar_window_open, grid=[0, 1], align="left")
 calendar_w.tk.config(highlightthickness=0)
 calendar_w.tk.config(borderwidth=0)
@@ -304,7 +309,8 @@ minutes_label = Text(settings_window, "minutes.", grid=[2, 1], align="left")
 
 log_label = Text(settings_window, "Logging level: ", grid=[0, 4], align="left")
 
-combo = Combo(settings_window, options=["", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], command=update_log_level, grid=[1, 4], align="left")
+combo = Combo(settings_window, options=["", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], command=update_log_level,
+              grid=[1, 4], align="left")
 combo.value = read_conf_param('others', 'logging_level')
 
 clear_log = PushButton(settings_window, text="Clear Log", command=clear_log, grid=[2, 4])
@@ -339,11 +345,11 @@ for day in calendar.day_name:
     # print (day[0:3])
     Text(calendar_window, day[0:3], grid=[0, i], align="left")
     i = i + 1
-    hours = range(0,23)
+    hours = range(0, 23)
     for count in hours:
         count = count + 1
-        PushButton(calendar_window, text=str(count)+":00", grid=[count, i])
-    
+        PushButton(calendar_window, text=str(count) + ":00", grid=[count, i])
+
 calendar_window.hide()
 
 # Final App display
