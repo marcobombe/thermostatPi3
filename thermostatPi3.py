@@ -15,6 +15,8 @@ import calendar
 import logging
 
 # Permanent configuration utility imports
+from guizero import PushButton
+
 from thermo_configuration import init_conf
 from thermo_configuration import read_conf
 from thermo_configuration import read_conf_param
@@ -193,7 +195,7 @@ def clear_log():
         logging.critical('Log file does not exist.')
 
 
-# Setting up the main App window properies
+# Setting up the main App window properties
 app = App(title="thermostatPi3", layout="grid")
 # app.tk.attributes("-fullscreen",True)
 
@@ -215,14 +217,14 @@ logging.info('Logging started')
 # Permanent configuration startup test, and initialization
 init_conf()
 
-# Basic configuration file chech
+# Basic configuration file check
 read_conf()
 read_conf_param('thermostatPi', 'config_version')
 
 # Update logging level
 update_log_level(read_conf_param("others", "logging_level"))
 
-# Material design dark theme settings_w.
+# Material design dark theme settings.
 app.bg = "#121212"
 app.text_color = "white"
 
@@ -334,21 +336,140 @@ settings_window.hide()
 calendar_window = Window(app, title="Calendar", layout="grid")
 # calendar_window.tk.attributes("-fullscreen",True)
 
-# Material design dark theme for settings window.
+# Material design dark theme for calendar window.
 calendar_window.bg = "#121212"
 calendar_window.text_color = "white"
 
+# Monday Settings Window
+mon_settings_window = Window(app, title="Mon Settings", layout="grid")
+# mon_settings_window.tk.attributes("-fullscreen",True)
+
+# Material design dark theme.
+mon_settings_window.bg = "#121212"
+mon_settings_window.text_color = "white"
+mon_settings_window_title = Text(mon_settings_window, "Monday hours: ", grid=[0, 0], align="left")
+
+on_off_mon = ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF",
+              "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF",
+              "OFF", "OFF", "OFF", "OFF"]
+
+
+def set_hour_on_off():
+    on_off_mon[5] = "ON"
+
+
+def draw():
+    i = 1
+    count2 = 0
+    hours = range(0, 24)
+    for count in hours:
+        if count < 10:
+            button_text = "0" + str(count)
+            button_text2 = "0" + str(count + 1)
+        else:
+            button_text = str(count)
+            button_text2 = str(count + 1)
+        text = Text(mon_settings_window, text=button_text + ":00", size=5, grid=[count2, i], align="right")
+        button = PushButton(mon_settings_window, text="OFF", grid=[count2 + 1, i], align="left",
+                            command=set_hour_on_off)
+        button.text = on_off_mon[count]
+        if on_off_mon[count] == "OFF":
+            button.bg = "blue"
+        else:
+            button.bg = "red"
+        button.text_size = 5
+        text = Text(mon_settings_window, text=button_text2 + ":00", size=5, grid=[count2 + 2, i], align="left")
+        count2 = count2 + 3
+
+        if count2 % 9 == 0:
+            if i != 0:
+                i = i + 1
+                count2 = 0
+
+
+draw()
+
+
+def mon_settings_window_close():
+    mon_settings_window.hide()
+
+
+mon_settings_window_close = PushButton(mon_settings_window, text="Close", command=mon_settings_window_close,
+                                       grid=[10, 10])
+mon_settings_window_close.tk.config(highlightthickness=0)
+mon_settings_window_close.tk.config(borderwidth=0)
+mon_settings_window_close.text_color = "red"
+mon_settings_window.hide()
+
+
+def open_mon_settings():
+    mon_settings_window.show(True)
+
+
+def open_tue_settings():
+    pass
+
+
+def open_wed_settings():
+    pass
+
+
+def open_thu_settings():
+    pass
+
+
+def open_fri_settings():
+    pass
+
+
+def open_sat_settings():
+    pass
+
+
 calendar_title = Text(calendar_window, "Calendar: ", grid=[0, 0], align="left")
 
-i = 1
-for day in calendar.day_name:
-    # print (day[0:3])
-    Text(calendar_window, day[0:3], grid=[0, i], align="left")
-    i = i + 1
-    hours = range(0, 23)
-    for count in hours:
-        count = count + 1
-        PushButton(calendar_window, text=str(count) + ":00", grid=[count, i])
+mon_settings = PushButton(calendar_window, text="Mon", command=open_mon_settings, grid=[1, 1])
+mon_settings.tk.config(highlightthickness=0)
+mon_settings.tk.config(borderwidth=0)
+
+tue_settings = PushButton(calendar_window, text="Tue", command=open_tue_settings, grid=[2, 1])
+tue_settings.tk.config(highlightthickness=0)
+tue_settings.tk.config(borderwidth=0)
+
+wed_settings = PushButton(calendar_window, text="Wed", command=open_wed_settings, grid=[3, 1])
+wed_settings.tk.config(highlightthickness=0)
+wed_settings.tk.config(borderwidth=0)
+
+thu_settings = PushButton(calendar_window, text="Thu", command=open_thu_settings, grid=[4, 1])
+thu_settings.tk.config(highlightthickness=0)
+thu_settings.tk.config(borderwidth=0)
+
+fri_settings = PushButton(calendar_window, text="Fri", command=open_fri_settings, grid=[5, 1])
+fri_settings.tk.config(highlightthickness=0)
+fri_settings.tk.config(borderwidth=0)
+
+sat_settings = PushButton(calendar_window, text="Sat", command=open_sat_settings, grid=[6, 1])
+sat_settings.tk.config(highlightthickness=0)
+sat_settings.tk.config(borderwidth=0)
+
+sun_settings = PushButton(calendar_window, text="Sun", grid=[7, 1])
+sun_settings.tk.config(highlightthickness=0)
+sun_settings.tk.config(borderwidth=0)
+
+calendar_close = PushButton(calendar_window, text="Close", command=calendar_window_close, grid=[8, 2])
+calendar_close.tk.config(highlightthickness=0)
+calendar_close.tk.config(borderwidth=0)
+calendar_close.text_color = "red"
+
+# i = 1
+# for day in calendar.day_name:
+#     print (day[0:3])
+#     Text(calendar_window, day[0:3], grid=[0, i], align="left")
+#     i = i + 1
+#     hours = range(0, 23)
+#     for count in hours:
+#         count = count + 1
+#         PushButton(calendar_window, text=str(count) + ":00", grid=[count, i])
 
 calendar_window.hide()
 
