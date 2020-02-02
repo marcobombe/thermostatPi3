@@ -22,6 +22,8 @@ from thermo_configuration import read_conf
 from thermo_configuration import read_conf_param
 from thermo_configuration import write_conf_param
 
+from functools import partial
+
 # Global Variables
 current_temp = 0.0
 set_point_temp = 0.0
@@ -104,6 +106,7 @@ def internet_connection_check():
 
 # Connection status update function    
 def update_connection_status():
+    pass
     if internet_connection_check():
         connection_status_w.value = "WIFI-ON"
         connection_status_w.text_color = "green"
@@ -332,33 +335,49 @@ close.text_color = "red"
 
 settings_window.hide()
 
+def window_set_fullscreen(window):
+    window.tk.attributes("-fullscreen",True)
+
+def window_set_material_design_theme(window):
+    window.bg = "#121212"
+    window.text_color = "white"
+
 # Calendar Window
 calendar_window = Window(app, title="Calendar", layout="grid")
-# calendar_window.tk.attributes("-fullscreen",True)
+# window_set_fullscreen(calendar_window)
+
 
 # Material design dark theme for calendar window.
-calendar_window.bg = "#121212"
-calendar_window.text_color = "white"
-
+window_set_material_design_theme(calendar_window)
 # Monday Settings Window
 mon_settings_window = Window(app, title="Mon Settings", layout="grid")
-# mon_settings_window.tk.attributes("-fullscreen",True)
-
+# window_set_fullscreen(mon_settings_window)
 # Material design dark theme.
-mon_settings_window.bg = "#121212"
-mon_settings_window.text_color = "white"
+window_set_material_design_theme(mon_settings_window)
+
+
 mon_settings_window_title = Text(mon_settings_window, "Monday hours: ", grid=[0, 0], align="left")
 
 on_off_mon = ["OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF",
               "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF", "OFF",
               "OFF", "OFF", "OFF", "OFF"]
 
+def set_hour_on_off(count, button):
+    if button.bg == "blue":
+        button.bg = "red"
+        button.text = "ON"
+        on_off_mon[count] = "ON"
+    elif button.bg == "red":
+        button.bg = "blue"
+        button.text = "OFF"
+        on_off_mon[count] = "OFF"
 
-def set_hour_on_off():
-    on_off_mon[5] = "ON"
+    print ("-------------------------")
+    print (on_off_mon)
+    print ("-------------------------")
 
 
-def draw():
+def draw_init(day_window, on_off_hour_list):
     i = 1
     count2 = 0
     hours = range(0, 24)
@@ -369,16 +388,19 @@ def draw():
         else:
             button_text = str(count)
             button_text2 = str(count + 1)
-        text = Text(mon_settings_window, text=button_text + ":00", size=5, grid=[count2, i], align="right")
-        button = PushButton(mon_settings_window, text="OFF", grid=[count2 + 1, i], align="left",
-                            command=set_hour_on_off)
-        button.text = on_off_mon[count]
-        if on_off_mon[count] == "OFF":
+        text = Text(day_window, text=button_text + ":00", size=5, grid=[count2, i], align="right")
+
+        button = PushButton(day_window, text="OFF", grid=[count2 + 1, i], align="left")
+        button.when_clicked = partial(set_hour_on_off, count, button)
+        
+        if on_off_hour_list[count] == "OFF":
             button.bg = "blue"
+            button.text = "OFF"
         else:
             button.bg = "red"
+            button.text = "ON"
         button.text_size = 5
-        text = Text(mon_settings_window, text=button_text2 + ":00", size=5, grid=[count2 + 2, i], align="left")
+        text = Text(day_window, text=button_text2 + ":00", size=5, grid=[count2 + 2, i], align="left")
         count2 = count2 + 3
 
         if count2 % 9 == 0:
@@ -387,12 +409,10 @@ def draw():
                 count2 = 0
 
 
-draw()
-
+draw_init(mon_settings_window, on_off_mon)
 
 def mon_settings_window_close():
     mon_settings_window.hide()
-
 
 mon_settings_window_close = PushButton(mon_settings_window, text="Close", command=mon_settings_window_close,
                                        grid=[10, 10])
